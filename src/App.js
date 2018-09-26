@@ -1,18 +1,46 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+
+const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const CalendarHeader = () => (
+  <div
+    style={{ display: 'flex', justifyContent: 'space-around', maxWidth: 1550 }}
+  >
+    {days.map(day => (
+      <h3>{day}</h3>
+    ))}
+  </div>
+);
+
+const weeks = [0, 1, 2, 3, 4];
 
 class App extends Component {
+  state = {};
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div>
+        <div>
+          <CalendarHeader />
+          <div style={{ marginLeft: 95 }}>
+            {weeks.map(week => (
+              <div style={{ display: 'flex' }}>
+                {days.map(day => (
+                  <div
+                    style={{
+                      border: '1px solid black',
+                      width: 220,
+                      height: 160
+                    }}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
