@@ -45,9 +45,12 @@ const CalendarHeader = ({ currentMonth, onNextMonth, onPrevMonth }) => (
 
 const weeks = [0, 1, 2, 3, 4];
 
+const createCalendar = () => {};
+
 class App extends Component {
   state = {
-    currentMonth: 0
+    currentMonth: 0,
+    calendarMatrix: createCalendar()
   };
 
   componentDidMount() {
@@ -102,3 +105,17 @@ class App extends Component {
 }
 
 export default App;
+
+// cases for 6 rows
+// if first day is on a friday and there are 31 days in that month
+// if first day is on a saturday and there are 30 or more days in that month
+// [26,27,28,29,30,31,1]
+// [2,3,4,5,6,7,8]
+// [9,10,11,12,13,14,15]
+// [16,17,18,19,20,21,22]
+// [23,24,25,26,27,28,29]
+// [30,1,2,3,4,5,6]
+
+// firstDayOfTheMonth
+// lastDayOfMonth
+// maxDaysOfPrevMonth
