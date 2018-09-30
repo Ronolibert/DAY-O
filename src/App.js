@@ -1,31 +1,11 @@
 import React, { Component, Fragment } from 'react';
-import logo from './logo.svg';
-
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-];
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+import moment from 'moment';
+import { getFormattedDay } from './helpers';
+import { daysAbbr, months, MODE } from './constants';
 
 const CalendarHeader = ({ currentMonth, onNextMonth, onPrevMonth }) => (
-  <div style={{ maxWidth: 1550 }}>
-    <h2
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginLeft: 95
-      }}
-    >
+  <div>
+    <h2>
       <button onClick={onPrevMonth}>PREV</button>
       {months[currentMonth]}
       <button onClick={onNextMonth}>NEXT</button>
@@ -36,71 +16,91 @@ const CalendarHeader = ({ currentMonth, onNextMonth, onPrevMonth }) => (
         justifyContent: 'space-around'
       }}
     >
-      {days.map(day => (
+      {daysAbbr.map(day => (
         <h3>{day}</h3>
       ))}
     </div>
   </div>
 );
 
-const weeks = [0, 1, 2, 3, 4];
-
-const createCalendar = () => {};
+const SpaceBetween = ({ children, style }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', ...style }}>
+    {children}
+  </div>
+);
 
 class App extends Component {
-  state = {
-    currentMonth: 0,
-    calendarMatrix: createCalendar()
-  };
-
-  componentDidMount() {
-    this.setState({ currentMonth: new Date().getMonth() });
-  }
-
-  handlePrevMonth = () => {
-    const newMonth = this.state.currentMonth - 1;
-    if (newMonth >= 0) {
-      this.setState({ currentMonth: newMonth });
-    }
-  };
-
-  handleNextMonth = () => {
-    const newMonth = this.state.currentMonth + 1;
-    if (newMonth <= 11) {
-      this.setState({ currentMonth: newMonth });
-    }
-  };
-
   render() {
-    const { currentMonth } = this.state;
     return (
       <div>
-        <div>
-          <CalendarHeader
-            currentMonth={currentMonth}
-            onNextMonth={this.handleNextMonth}
-            onPrevMonth={this.handlePrevMonth}
-          />
-          <div style={{ marginLeft: 95 }}>
-            {weeks.map(week => (
-              <div style={{ display: 'flex' }}>
-                {days.map(day => (
-                  <div
-                    style={{
-                      border: '1px solid black',
-                      width: 220,
-                      height: 160
-                    }}
-                  >
-                    {day}
-                  </div>
+        <Calendar>
+          {({ weekDates }) => (
+            <>
+              <SpaceBetween style={{ display: 'block' }}>
+                <button>PREV</button>
+                <button>NEXT</button>
+              </SpaceBetween>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between ' }}
+              >
+                {weekDates.map((date, index) => (
+                  <h2>
+                    {daysAbbr[index]}: {date}
+                  </h2>
                 ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </>
+          )}
+        </Calendar>
       </div>
     );
+  }
+}
+
+/**
+ * @returns {Array<Date>}
+ */
+const getDatesForWeek = () => {
+  const startOfWeek = moment().startOf('isoWeek');
+  const endOfWeek = moment().endOf('isoWeek');
+
+  const days = [];
+  let day = startOfWeek;
+
+  while (day <= endOfWeek) {
+    days.push(getFormattedDay(day));
+    day = day.clone().add(1, 'd');
+  }
+
+  return days;
+};
+
+class Calendar extends Component {
+  state = {
+    mode: MODE.month,
+    currentDay: new Date().getDay(),
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear(),
+    weekDates: getDatesForWeek()
+  };
+
+  get getStateAndMethods() {
+    return {
+      ...this.state,
+      handleNext: this.handleNext,
+      handlePrev: this.handlePrev,
+      onModeChange: this.handleModeChange
+    };
+  }
+
+  handlePrev = () => {};
+
+  handleNext = () => {};
+
+  handleModeChange = mode => this.setState({ mode });
+
+  render() {
+    return <div>{this.props.children(this.getStateAndMethods)}</div>;
   }
 }
 
